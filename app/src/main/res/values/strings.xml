@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">RaumTracker</string>
+
+    <string name="action_ok">OK</string>
+
+    <!-- Title text for the empty view, which describes the empty coordinate house image [CHAR LIMIT=50] -->
+    <string name="empty_view_title_text">It\'s a bit rest moment here...</string>
+
+    <string name="empty_view_subtitle_text">Get started by adding a coordinate</string>
+
+    <string name="action_send_normal_sms">Open Tracker</string>
+    <string name="action_send_condition_sms">Send Track SMS</string>
+
+    <string name="your_cellphone_number">Your cellphone number:</string>
+    <string name="phone_number_hint">0757022731</string>
+    <string name="toast_sending_sms">Sending sms…</string>
+
+    <string name="permission_alert_dialog_title">Requesting SMS permission</string>
+    <string name="permission_dialog_message">The app will now request your permission to send and read SMS related services.</string>
+
+    <string name="error_invalid_phone_number">Invalid phone number</string>
+    <string name="category_overview">Overview</string>
+    <string name="action_insert_dummy_data">insert manual tracks</string>
+    <string name="action_delete_all_entries">delete all tracks</string>
+</resources>
