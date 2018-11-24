@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="@dimen/activity_margin">
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/coordinate_point"
@@ -14,8 +14,8 @@
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-medium"
         android:textAppearance="?android:textAppearanceMedium"
-        android:textColor="#2B3D4D"
-        tools:text="Pet's Name"/>
+        tools:text="Pet's Name"
+        />
 
     <TextView
         android:id="@+id/date_time"
@@ -23,6 +23,6 @@
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif"
         android:textAppearance="?android:textAppearanceSmall"
-        android:textColor="#AEB6BD"
         tools:text="Hungarian Vizsla"/>
 </LinearLayout>
+

@@ -23,7 +23,8 @@
 
         <activity android:name=".RaumActivity"
             android:label="Track My Car"
-            android:theme="@style/AppTheme">
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+           >
 
 
         </activity>

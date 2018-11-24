@@ -2,16 +2,22 @@ package muchbeer.raum.com.raumtracker;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
+
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.app.LoaderManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,7 +25,12 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import muchbeer.raum.com.raumtracker.data.RaumContract;
+import muchbeer.raum.com.raumtracker.data.RaumDbHelper;
+import muchbeer.raum.com.raumtracker.utilitiy.MyAdapter;
+import muchbeer.raum.com.raumtracker.utilitiy.RaumData;
 
 /**
  * Created by muchbeer on 21/11/2018.
@@ -28,48 +39,56 @@ import muchbeer.raum.com.raumtracker.data.RaumContract;
 public class RaumActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int RAUM_LOADER = 0;
+    RecyclerView rv;
+    MyAdapter mAdapter;
 
-    private RaumCursorAdapter mCursorAdapter;
+
+    RaumDbHelper dbHelper = new RaumDbHelper(this);
+    private SQLiteDatabase mDatabase;
+
     @Override
       protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_raum);
 
-        // Setup FAB to open EditorActivity
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        mDatabase = dbHelper.getWritableDatabase();
+        //recycler
+        rv= (RecyclerView) findViewById(R.id.recyclerView);
+
+        //SET PROPS
+        rv.setLayoutManager(new LinearLayoutManager(this));
+
+        rv.setItemAnimator(new DefaultItemAnimator());
+
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 insertRaum();
+          /*      Cursor cursorRead =
+                        getContentResolver().query(RaumContract.RaumEntry.CONTENT_URI,
+                                new String[]{RaumContract.RaumEntry._ID},
+                                null,
+                                null,
+                                null);
+                if (cursorRead.getCount() == 0){
+                  //  insertData();
+                    insertRaum();
+                }*/
+
                /* Intent intent = new Intent(RaumActivity.this, EditorActivity.class);
                 startActivity(intent);*/
             }
         });
 
-        // Find the ListView which will be populated with the raum data
-        ListView raumListView = (ListView) findViewById(R.id.list_view);
 
-        // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
-        View emptyView = findViewById(R.id.empty_view);
-        raumListView.setEmptyView(emptyView);
-
-        raumListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-               /* Intent intent = new Intent(getBaseContext(), EditorActivity.class);
-                intent.setData(ContentUris.withAppendedId(RaumContract.RaumEntry.CONTENT_URI, id));
-                startActivity(intent);*/
-
-                Toast.makeText(getApplicationContext(),"Now you are successful made it", Toast.LENGTH_LONG).show();
-            }
-        });
-
-        // Create an empty adapter we will use to display the loaded data.
-        // We pass null for the cursor, then update it in onLoadFinished()
-        ListView listView = (ListView) findViewById(R.id.list_view);
-        mCursorAdapter = new RaumCursorAdapter(this, null);
-        listView.setAdapter(mCursorAdapter);
-
+        mAdapter = new MyAdapter(this, null);
+        rv.setAdapter(mAdapter);
         getLoaderManager().initLoader(RAUM_LOADER, null, RaumActivity.this );
 
     }
@@ -79,15 +98,12 @@ public class RaumActivity extends AppCompatActivity implements LoaderManager.Loa
         // and Toto's Raum attributes are the values.
         ContentValues values = new ContentValues();
         values.put(RaumContract.RaumEntry.COLUMN_COORDINATE, "get");
-        values.put(RaumContract.RaumEntry.COLUMN_DATE, "ds");
+       // values.put(RaumContract.RaumEntry.COLUMN_DATE, "");
         values.put(RaumContract.RaumEntry.COLUMN_DAT, 74);
         values.put(RaumContract.RaumEntry.COLUMN_STREET_NAME, "Victorial place");
 
-        // Insert a new row for Toto into the provider using the ContentResolver.
-        // Use the {@link RaumEntry#CONTENT_URI} to indicate that we want to insert
-        // into the raum database table.
-        // Receive the new content URI that will allow us to access Toto's data in the future.
-        Uri newUri = getContentResolver().insert(RaumContract.RaumEntry.CONTENT_URI, values);
+       getContentResolver().insert(RaumContract.RaumEntry.CONTENT_URI, values);
+
     }
 
     @Override
@@ -121,22 +137,44 @@ public class RaumActivity extends AppCompatActivity implements LoaderManager.Loa
         String[] projection = {
                 RaumContract.RaumEntry._ID,
                 RaumContract.RaumEntry.COLUMN_COORDINATE,
-                RaumContract.RaumEntry.COLUMN_DATE,
-                RaumContract.RaumEntry.COLUMN_DAT,
-                RaumContract.RaumEntry.COLUMN_STREET_NAME
+                RaumContract.RaumEntry.COLUMN_DATE
+
         };
-        return new CursorLoader(this, RaumContract.RaumEntry.CONTENT_URI, projection, null, null, null);
+        return new CursorLoader(this,
+                RaumContract.RaumEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null);
     }
 
     @Override
     public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor cursorData) {
-        mCursorAdapter.changeCursor(cursorData);
+
+        mAdapter.swapCursor(cursorData);
     }
 
     @Override
     public void onLoaderReset(android.content.Loader<Cursor> loader) {
-        mCursorAdapter.swapCursor(null);
+       // mCursorAdapter.swapCursor(null);
+        mAdapter.swapCursor(null);
+    }
+
+    //This is without COntent provider
+    public Cursor retriewCoordinateAll() {
+
+        return mDatabase.query(
+                RaumContract.RaumEntry.TABLE_NAME,
+                null,
+                null,
+                null,
+                null,
+                null,
+                RaumContract.RaumEntry.COLUMN_DATE + " DESC");
+    }
+
+    //This is with Content Provider
+
     }
 
 
-}

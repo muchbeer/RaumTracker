@@ -3,6 +3,7 @@ package muchbeer.raum.com.raumtracker.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import muchbeer.raum.com.raumtracker.data.RaumContract.RaumEntry;
 
@@ -20,7 +21,7 @@ public class RaumDbHelper extends SQLiteOpenHelper {
     /**
      * Database version. If you change the database schema, you must increment the database version.
      */
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 6;
 
     /**
      * Constructs a new instance of {@link RaumDbHelper}.
@@ -40,9 +41,11 @@ public class RaumDbHelper extends SQLiteOpenHelper {
         String SQL_CREATE_TRACK_TABLE =  "CREATE TABLE " + RaumEntry.TABLE_NAME + " ("
                 + RaumEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + RaumEntry.COLUMN_COORDINATE + " TEXT NOT NULL, "
-                + RaumEntry.COLUMN_DATE + " TEXT, "
+                + RaumEntry.COLUMN_DATE + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
                 + RaumEntry.COLUMN_DAT + " INTEGER NOT NULL, "
-                + RaumEntry.COLUMN_STREET_NAME + " TEXT);";
+                + RaumEntry.COLUMN_STREET_NAME + " TEXT" +
+
+                ");";
 
         // Execute the SQL statement
         db.execSQL(SQL_CREATE_TRACK_TABLE);
@@ -54,6 +57,18 @@ public class RaumDbHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // The database is still at version 1, so there's nothing to do be done here.
+
+        Log.w(LOG_TAG, "Upgrading database from version " + oldVersion + " to " +
+                newVersion + ". OLD DATA WILL BE DESTROYED");
+        // Drop the table
+        db.execSQL("DROP TABLE IF EXISTS " + RaumEntry.TABLE_NAME);
+        db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
+                RaumEntry.TABLE_NAME + "'");
+
+        // re-create database
+        //Please learn how to append column name to the column instead of dropping
+     //   db.execSQL("DROP TABLE IF EXISTS " + RaumEntry.TABLE_NAME);
+        onCreate(db);
     }
 
 

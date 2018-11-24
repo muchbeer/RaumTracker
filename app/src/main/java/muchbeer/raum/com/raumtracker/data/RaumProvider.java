@@ -112,9 +112,9 @@ public class RaumProvider extends ContentProvider {
             throw new IllegalArgumentException("Coordinate required");
         }
         String column_date = values.getAsString(RaumContract.RaumEntry.COLUMN_DATE);
-        if (column_date == null) {
+        /*if (column_date == null) {
             throw new IllegalArgumentException("Date requires ");
-        }
+        }*/
         Integer column_dat = values.getAsInteger(RaumContract.RaumEntry.COLUMN_DAT);
         if (column_dat == null) {
             throw new IllegalArgumentException("Dat requires a gender");
